@@ -122,7 +122,7 @@ public:
 
     }
 
-    void listTask()
+    void listTask(int argc, char* argv[])
     {
         json lister;
         std::ifstream infile("storage.json");
@@ -141,9 +141,50 @@ public:
         int lister_size = lister["task"].size();
         for (int  i = 0; i < lister_size; i++)
         {
-            std::cout <<lister["task"].at(i).at("Id")<<'.'<<lister["task"].at(i).at("Description") <<'\n';
+            auto strStatus = lister["task"].at(i).at("Status");
+
+            if(argc == 2)
+                std::cout <<lister["task"].at(i).at("Id")<<'.'<<lister["task"].at(i).at("Description") <<'\n';
+            if(std::string(argv[2]) == "done" && strStatus == statusToString(done))
+                std::cout <<lister["task"].at(i).at("Id")<<'.'<<lister["task"].at(i).at("Description") <<'\n';
+            if(std::string(argv[2]) == "todo" && strStatus == statusToString(todo))
+                std::cout <<lister["task"].at(i).at("Id")<<'.'<<lister["task"].at(i).at("Description") <<'\n';
+            if(std::string(argv[2]) == "in-progress" && strStatus == statusToString(in_progress))
+                std::cout <<lister["task"].at(i).at("Id")<<'.'<<lister["task"].at(i).at("Description") <<'\n';
         }
         
+    }
+
+    void doneTask(int argc, char* argv[])
+    {
+        std::ifstream infile{"storage.json"};
+        json doner;
+
+        if(infile.is_open() && infile.peek()!=std::ifstream::traits_type::eof())
+        {
+           infile >> doner;
+        }else
+        {
+            std::cerr << "No existing list found.\nUse 'task-cli add <task>' to add task\n";
+            return;
+        }
+        infile.close();
+        int id_number = converStringToNumber(argv);
+        int doner_size = doner["task"].size();
+        time_t timestamp = std::time(nullptr);
+
+        for(int i = 0; i< doner_size; i++)
+        {
+            if(doner["task"].at(i).at("Id") == id_number)
+            {
+                doner["task"].at(i).at("Status") = statusToString(done);
+                doner["task"].at(i).at("UpdatedAt") = ctime(&timestamp);
+                break;
+            }
+        }
+
+        std::ofstream outfile {"storage.json"};
+        outfile <<std::setw(4)<< doner;
     }
     
     void deleteTask(int argc, char* argv[])
@@ -171,7 +212,7 @@ public:
         infile.close();
 
         int deleter_size = deleter["task"].size();
-        for(int i = 0; i< deleter; i++)
+        for(int i = 0; i< deleter_size; i++)
         {
             if(deleter["task"].at(i).at("Id") == id_number)
             {
@@ -241,13 +282,18 @@ int main(int argc, char *argv[])
 
     if(std::string(argv[1]) == "list")
     {
-        varTask.listTask();
+        varTask.listTask(argc,argv);
         return 0;
     }
 
     if(std::string(argv[1]) == "delete")
     {
         varTask.deleteTask(argc,argv);
+    }
+    
+    if(std::string(argv[1]) == "mark-done")
+    {
+        varTask.doneTask(argc,argv);
     }
 
 }
