@@ -108,6 +108,7 @@ public:
             {
                 updater["task"].at(i).at("Description") = description;
                 updater["task"].at(i).at("UpdatedAt") = ctime(&updatedtime);
+                break;
             }
         }
 
@@ -138,6 +139,48 @@ public:
             std::cout <<lister["task"].at(i).at("Id")<<'.'<<lister["task"].at(i).at("Description") <<'\n';
         }
         
+    }
+    
+    void deleteTask(int argc, char* argv[])
+    {
+        if(argc == 2){
+            std::cerr << "Please use update feature properly\n";
+            return;
+        }if(argc > 3){
+            std::cerr << "Only one Key accepted at a time\n";
+            return;
+        }
+
+        int id_number = converStringToNumber(argv);
+
+        json deleter;
+        std::ifstream infile("storage.json");
+        if(infile.is_open() && infile.peek()!=std::ifstream::traits_type::eof())
+        {
+           infile >> deleter;
+        }else
+        {
+            std::cerr << "No existing list found.\nUse 'task-cli add <task>' to add task\n";
+            return;
+        }
+        infile.close();
+
+        int deleter_size = deleter["task"].size();
+        for(int i = 0; i< deleter; i++)
+        {
+            if(deleter["task"].at(i).at("Id") == id_number)
+            {
+                deleter["task"].erase(i);
+                break;
+            }
+        }
+
+        std::ofstream outfile {"storage.json"};
+        outfile <<std::setw(4)<< deleter;
+
+
+
+
     }
 
 };
@@ -177,6 +220,11 @@ int main(int argc, char *argv[])
     {
         varTask.listTask();
         return 0;
+    }
+
+    if(std::string(argv[1]) == "delete")
+    {
+        varTask.deleteTask(argc,argv);
     }
 
 }
