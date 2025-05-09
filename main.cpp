@@ -9,13 +9,14 @@
 #include <string>
 #include <nlohmann/json.hpp>
 #include <fstream>
+#include <sstream>  //for std::stringstream
 
 using json = nlohmann::json;
 
 enum Status{
     todo,in_progress, done
 };
-
+int converStringToNumber(char* argv[]);
 class task 
 {
 public:
@@ -69,6 +70,51 @@ public:
         outfile<< std::setw(4)<<existing<<std::endl;
 
     }
+
+    void updateTask(int argc, char *argv[])
+    {
+        if(argc == 2){
+            std::cerr << "Please use update feature properly\n";
+            return;
+        }
+
+        int id_number = converStringToNumber(argv);
+        json updater;
+        std::ifstream infile("storage.json");
+        if(infile.is_open() && infile.peek()!=std::ifstream::traits_type::eof())
+        {
+           infile >> updater;
+        }else
+        {
+            std::cerr << "No existing list found.\nUse 'task-cli add <task>' to add task\n";
+            return;
+        }
+
+        infile.close();
+        std::string description;
+        time_t updatedtime;
+        for(int i = 3; i< argc; ++i)
+        {
+            description += argv[i];
+            if(i < argc -1 )
+                description += " ";
+        }
+
+        updatedtime = std::time(nullptr);
+        int updater_size = updater["task"].size();
+        for(int i = 0; i< updater_size; i++)
+        {
+            if(updater["task"].at(i).at("Id") == id_number)
+            {
+                updater["task"].at(i).at("Description") = description;
+                updater["task"].at(i).at("UpdatedAt") = ctime(&updatedtime);
+            }
+        }
+
+        std::ofstream outfile {"storage.json"};
+        outfile <<std::setw(4)<< updater;
+
+    }
     
     void listTask()
     {
@@ -96,6 +142,16 @@ public:
 
 };
 int task::counter{0};
+
+int converStringToNumber(char * argv[])
+{
+    int myint{};
+    std::stringstream convert{ argv[2] };
+    if(!(convert >> myint))
+        myint = 0;          //if conversion fails, set myint to a default value
+    return myint;
+}
+
 int main(int argc, char *argv[])
 {
     if(argc<2)
@@ -110,6 +166,11 @@ int main(int argc, char *argv[])
     {
         varTask.enterTask(argc,argv);
         varTask.addTask();
+    }
+
+    if(std::string(argv[1]) == "update")
+    {
+        varTask.updateTask(argc,argv);
     }
 
     if(std::string(argv[1]) == "list")
