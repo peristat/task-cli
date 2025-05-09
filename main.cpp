@@ -42,7 +42,7 @@ public:
                 }
         }
         
-    void printTask() const
+    void addTask() const
     {
         json existing = json::object({{"task",json::array({})},{"next_id",1}});
 
@@ -69,7 +69,31 @@ public:
         outfile<< std::setw(4)<<existing<<std::endl;
 
     }
- 
+    
+    void listTask()
+    {
+        json lister;
+        std::ifstream infile("storage.json");
+        
+        if(infile.is_open() && infile.peek()!=std::ifstream::traits_type::eof())
+        {
+           infile >> lister;
+        }else
+        {
+            std::cerr << "No existing list found.\nUse 'task-cli add <task>' to add task\n";
+            return;
+        }
+
+        infile.close();
+
+        int lister_size = lister["task"].size();
+        for (int  i = 0; i < lister_size; i++)
+        {
+            std::cout <<lister["task"].at(i).at("Id")<<'.'<<lister["task"].at(i).at("Description") <<'\n';
+        }
+        
+    }
+
 };
 int task::counter{0};
 int main(int argc, char *argv[])
@@ -79,10 +103,19 @@ int main(int argc, char *argv[])
         std::cerr<<"Usage: ./task add <description>\n";
         return 1;
     }
+
     task varTask;
+
     if(std::string(argv[1]) == "add")
     {
         varTask.enterTask(argc,argv);
+        varTask.addTask();
     }
-    varTask.printTask();
+
+    if(std::string(argv[1]) == "list")
+    {
+        varTask.listTask();
+        return 0;
+    }
+
 }
