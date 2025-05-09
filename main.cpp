@@ -41,37 +41,33 @@ public:
                     m_description += " ";
                 }
         }
+        
     void printTask() const
     {
-        json o;
-        o["Id"] = m_id;
-        o["Description"] = m_description;
-        o["CreateAt"] = ctime(&m_createdAt);
-        o["UpdatedAt"] = ctime(&m_updatedAt);
+        json existing = json::object({{"task",json::array({})},{"next_id",1}});
 
-        json existing = json::array();
         std::ifstream infile("storage.json");
         //To check whether the "storage.json" is empty if not store the objects to the json exisiting array
         if(infile.is_open() && infile.peek()!=std::ifstream::traits_type::eof())
         {
             infile >> existing;
-            // if(!existing.is_array())
-            // {
-            //     json temp = existing;
-            //     existing = json::array();
-            //     existing.push_back(temp);
-            // }
         }
         infile.close();
 
-        existing.push_back(o);
+        int next_id = existing["next_id"];
+
+        json::object_t o;
+        o["Id"] = next_id;
+        o["Description"] = m_description;
+        o["CreateAt"] = ctime(&m_createdAt);
+        o["UpdatedAt"] = ctime(&m_updatedAt);
+
+        existing["task"].push_back(o);
+        existing["next_id"] = next_id+1;
+
         std::ofstream outfile("storage.json");
         outfile<< std::setw(4)<<existing<<std::endl;
 
-        // std::cout << "Id: "<<m_id<<std::endl;
-        // std::cout << "Description: "<<m_description<<std::endl;
-        // std::cout << "Created At: "<<ctime(&m_createdAt)<<std::endl;
-        // std::cout << "Updated At: "<<ctime(&m_updatedAt)<<std::endl;
     }
  
 };
