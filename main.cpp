@@ -16,7 +16,11 @@ using json = nlohmann::json;
 enum Status{
     todo,in_progress, done
 };
+
 int converStringToNumber(char* argv[]);
+Status stringToStatus(const std::string& str);
+std::string statusToString(const Status sta);
+
 class task 
 {
 public:
@@ -62,6 +66,7 @@ public:
         o["Description"] = m_description;
         o["CreateAt"] = ctime(&m_createdAt);
         o["UpdatedAt"] = ctime(&m_updatedAt);
+        o["Status"] = statusToString(m_status);
 
         existing["task"].push_back(o);
         existing["next_id"] = next_id+1;
@@ -116,7 +121,7 @@ public:
         outfile <<std::setw(4)<< updater;
 
     }
-    
+
     void listTask()
     {
         json lister;
@@ -186,6 +191,24 @@ public:
 };
 int task::counter{0};
 
+Status stringToStatus(const std::string& str)
+{
+    if(str == "To Do") return todo;
+    if(str == "In Progress") return in_progress;
+    if(str == "Done") return done;
+
+    return todo;
+}
+std::string statusToString(const Status sta)
+{
+    switch (sta)
+    {
+    case todo: return "To Do";
+    case in_progress: return "In Progress";
+    case done: return "Done";
+    default: return "Unknown";
+    }
+}
 int converStringToNumber(char * argv[])
 {
     int myint{};
