@@ -155,14 +155,14 @@ public:
         
     }
 
-    void doneTask(int argc, char* argv[])
+    void markTask(int argc, char* argv[])
     {
         std::ifstream infile{"storage.json"};
-        json doner;
+        json marker;
 
         if(infile.is_open() && infile.peek()!=std::ifstream::traits_type::eof())
         {
-           infile >> doner;
+           infile >> marker;
         }else
         {
             std::cerr << "No existing list found.\nUse 'task-cli add <task>' to add task\n";
@@ -170,21 +170,28 @@ public:
         }
         infile.close();
         int id_number = converStringToNumber(argv);
-        int doner_size = doner["task"].size();
+        int marker_size = marker["task"].size();
         time_t timestamp = std::time(nullptr);
 
-        for(int i = 0; i< doner_size; i++)
+        for(int i = 0; i< marker_size; i++)
         {
-            if(doner["task"].at(i).at("Id") == id_number)
+            if(marker["task"].at(i).at("Id") == id_number)
             {
-                doner["task"].at(i).at("Status") = statusToString(done);
-                doner["task"].at(i).at("UpdatedAt") = ctime(&timestamp);
+                if(std::string(argv[1])=="mark-done")
+                {
+                    marker["task"].at(i).at("Status") = statusToString(done);
+                }
+                if(std::string(argv[1])== "mark-inprogress")
+                {
+                    marker["task"].at(i).at("Status") = statusToString(in_progress);
+                }
+                marker["task"].at(i).at("UpdatedAt") = ctime(&timestamp);
                 break;
             }
         }
 
         std::ofstream outfile {"storage.json"};
-        outfile <<std::setw(4)<< doner;
+        outfile <<std::setw(4)<< marker;
     }
     
     void deleteTask(int argc, char* argv[])
@@ -291,9 +298,9 @@ int main(int argc, char *argv[])
         varTask.deleteTask(argc,argv);
     }
     
-    if(std::string(argv[1]) == "mark-done")
+    if(std::string(argv[1]) == "mark-done" || std::string(argv[1]) == "mark-inprogress")
     {
-        varTask.doneTask(argc,argv);
+        varTask.markTask(argc,argv);
     }
 
 }
