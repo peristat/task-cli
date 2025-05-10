@@ -145,11 +145,11 @@ public:
 
             if(argc == 2)
                 std::cout <<lister["task"].at(i).at("Id")<<'.'<<lister["task"].at(i).at("Description") <<'\n';
-            if(std::string(argv[2]) == "done" && strStatus == statusToString(done))
+            else if(std::string(argv[2]) == "done" && strStatus == statusToString(done))
                 std::cout <<lister["task"].at(i).at("Id")<<'.'<<lister["task"].at(i).at("Description") <<'\n';
-            if(std::string(argv[2]) == "todo" && strStatus == statusToString(todo))
+            else if(std::string(argv[2]) == "todo" && strStatus == statusToString(todo))
                 std::cout <<lister["task"].at(i).at("Id")<<'.'<<lister["task"].at(i).at("Description") <<'\n';
-            if(std::string(argv[2]) == "in-progress" && strStatus == statusToString(in_progress))
+            else if(std::string(argv[2]) == "in-progress" && strStatus == statusToString(in_progress))
                 std::cout <<lister["task"].at(i).at("Id")<<'.'<<lister["task"].at(i).at("Description") <<'\n';
         }
         
