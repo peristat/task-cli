@@ -1,7 +1,7 @@
 # task-cli
 
   
-**Task CLI** is a simple and lightweight command-line application for tracking and managing your daily tasks. It uses a JSON file to persist task data locally.
+**[Task CLI](https://github.com/peristat/task-cli)** is a simple and lightweight command-line application for tracking and managing your daily tasks. It uses a JSON file to persist task data locally.
 
 ---
  
@@ -32,7 +32,7 @@ cd task-cli
 ```
 
 2. **Ensure the JSON header is in place**:
-- Make sure `include/json.hpp exists.
+- Make sure `include/json.hpp` exists.
 - if not, download it from:
 	https://github.com/nlohmann/json/releases
 
