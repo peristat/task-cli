@@ -13,6 +13,12 @@
 
 using json = nlohmann::json;
 
+namespace utils{
+    void printError(const std::string &msg){
+        std::cerr << "[ERROR]" << msg << std::endl;
+    }
+}
+
 enum Status{
     todo,in_progress, done
 };
@@ -68,6 +74,9 @@ public:
         o["UpdatedAt"] = ctime(&m_updatedAt);
         o["Status"] = statusToString(m_status);
 
+        //to output task added msg with it's index
+        std::cout << "Task added successfully (ID: " << next_id << ")\n";
+
         existing["task"].push_back(o);
         existing["next_id"] = next_id+1;
 
@@ -96,6 +105,14 @@ public:
         }
 
         infile.close();
+
+        //check wheather the give Id exit or not
+        if(!doesIdExist(id_number))
+        {
+            utils::printError("The given Id doesn't exit.");
+            return;
+        }
+
         std::string description;
         time_t updatedtime;
         for(int i = 3; i< argc; ++i)
@@ -138,6 +155,12 @@ public:
 
         infile.close();
 
+        if(lister["task"].empty())
+        {
+            utils::printError("No existing task found.\nUse 'task-cli add <task>' to add task");
+            return;
+        }
+
         int lister_size = lister["task"].size();
         for (int  i = 0; i < lister_size; i++)
         {
@@ -169,7 +192,15 @@ public:
             return;
         }
         infile.close();
+
         int id_number = converStringToNumber(argv);
+
+        if(!doesIdExist(id_number))
+        {
+            utils::printError("The given Id doesn't exist.");
+            return;
+        }
+        
         int marker_size = marker["task"].size();
         time_t timestamp = std::time(nullptr);
 
@@ -197,7 +228,7 @@ public:
     void deleteTask(int argc, char* argv[])
     {
         if(argc == 2){
-            std::cerr << "Please use update feature properly\n";
+            std::cerr << "Please use delete feature properly\n";
             return;
         }if(argc > 3){
             std::cerr << "Only one Key accepted at a time\n";
@@ -218,6 +249,12 @@ public:
         }
         infile.close();
 
+        if(!doesIdExist(id_number))
+        {
+            utils::printError("The given Id doesn't exist.");
+            return;
+        }
+
         int deleter_size = deleter["task"].size();
         for(int i = 0; i< deleter_size; i++)
         {
@@ -234,6 +271,28 @@ public:
 
 
 
+    }
+    bool doesIdExist(int id)
+    {
+        json checker;
+        std::ifstream infile("storage.json");
+        if(infile.is_open() && infile.peek()!=std::ifstream::traits_type::eof())
+        {
+           infile >> checker;
+        }else
+        {
+            return false;
+        }
+        infile.close();
+
+        int checker_size = checker["task"].size();
+        for (int i = 0; i < checker_size; i++)
+        {
+            if(id == checker["task"].at(i).at("Id"))
+                return true;
+        }
+
+        return false;
     }
 
 };
