@@ -5,7 +5,7 @@
 
 ---
  
-## ✨ Features
+## Features
 - Add, update, and delete tasks
 - Mark tasks as **To Do**, **In Progress**, or **Done**
 - List all tasks or filter by status:
@@ -16,7 +16,7 @@
 
 ---
 
-## 🛠 Installation 
+## Installation 
 ### Requirements
 
 - **C++11** or later
@@ -59,7 +59,7 @@ And verify if works:
 task-cli list
 ```
 
-# 🚀 example usage
+# example usage
 
 ```bash
 # Adding a new task
@@ -86,7 +86,7 @@ task-cli list todo
 task-cli list in-progress
 ```
 
-# 🧾Task Properties
+# Task Properties
 
 Each task have the following properties:
 
