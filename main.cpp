@@ -7,7 +7,7 @@
 #include <iostream>
 #include <ctime>
 #include <string>
-#include <include/json.hpp>
+#include <json.hpp>
 #include <fstream>
 #include <sstream>  //for std::stringstream
 
@@ -180,6 +180,7 @@ public:
 
     void markTask(int argc, char* argv[])
     {
+        (void)argc;
         std::ifstream infile{"storage.json"};
         json marker;
 
